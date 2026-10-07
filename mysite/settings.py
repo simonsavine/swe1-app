@@ -10,7 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
+import urllib.request
 from pathlib import Path
+
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,13 +23,51 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-local-development-only"
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Elastic Beanstalk sets DJANGO_DEBUG=False (see .ebextensions/django.config).
+DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = []
+# SECURITY WARNING: keep the secret key used in production secret!
+# Production reads it from the environment (`eb setenv DJANGO_SECRET_KEY=...`);
+# the placeholder is only acceptable for local development with DEBUG on.
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set when DEBUG is off.")
+    SECRET_KEY = "django-insecure-local-development-only"
+
+ALLOWED_HOSTS = [
+    "django-env.eba-hqpup4q6.us-east-1.elasticbeanstalk.com",
+    "127.0.0.1",
+    "localhost",
+]
+
+
+def _ec2_private_ip():
+    """Return this EC2 instance's private IP, or None when not running on EC2.
+
+    The Elastic Beanstalk load balancer health checks the instance by its
+    private IP, so it must be an allowed host or every health check gets a 400.
+    """
+    try:
+        token_req = urllib.request.Request(
+            "http://169.254.169.254/latest/api/token",
+            method="PUT",
+            headers={"X-aws-ec2-metadata-token-ttl-seconds": "60"},
+        )
+        token = urllib.request.urlopen(token_req, timeout=0.5).read().decode()
+        ip_req = urllib.request.Request(
+            "http://169.254.169.254/latest/meta-data/local-ipv4",
+            headers={"X-aws-ec2-metadata-token": token},
+        )
+        return urllib.request.urlopen(ip_req, timeout=0.5).read().decode()
+    except OSError:
+        return None
+
+
+_private_ip = _ec2_private_ip()
+if _private_ip:
+    ALLOWED_HOSTS.append(_private_ip)
 
 
 # Application definition
@@ -116,6 +158,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "static"
 
 
 # Email
