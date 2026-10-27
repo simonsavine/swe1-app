@@ -1,1 +1,35 @@
 #This is for Flake8 testing!
+
+name: Lint Codebase
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types:
+      - opened
+  push:
+    branches:
+      - main
+      - feature/*
+  jobs:
+    lint-codebase:
+      name: Lint Codebase
+      runs-on: mac-latest
+
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8
+
+    - name: Lint with flake8
+      run: |
+        flake8 --count --show-source -- statistics
