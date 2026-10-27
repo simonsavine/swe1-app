@@ -12,4 +12,8 @@ deploy:
 
 dist: focal
 language: python
-install: skip
+install:
+  - pip install -r requirements.txt black
+script:
+  - black --check
+  -python manage.py test
