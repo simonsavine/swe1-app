@@ -2,8 +2,13 @@ deploy:
   provider: elasticbeanstalk
   access_key_id: <AKIA5JMSUCCFV52MFOOV>
   secret_access_key: <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>
+  region: us-east-1
+  app: 
+  env:
   bucket: <bucket>
   edge: true # opt in to dpl v2
+  on:
+    branch: main
 
 dist: focal
 language: python
