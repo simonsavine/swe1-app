@@ -1,12 +1,12 @@
 deploy:
   provider: elasticbeanstalk
-  access_key_id: 
-  secret_access_key: 
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
   region: us-east-1
   app: swe1-app
   env: django-env
   bucket: <bucket>
-  edge: true # opt in to dpl v2
+  edge: true
   on:
     branch: main
 
