@@ -5,7 +5,7 @@ deploy:
   region: us-east-1
   app: swe1-app
   env: django-env
-  bucket: <bucket>
+  bucket: elasticbeanstalk-us-east-1-913524920459
   edge: true
   on:
     branch: main
@@ -19,4 +19,4 @@ install:
   - pip install flake8
 script:
   - black --check
-  -python manage.py test
+  - python manage.py test
