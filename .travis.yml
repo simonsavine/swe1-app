@@ -22,7 +22,7 @@ deploy:
   secret_access_key: $AWS_SECRET_ACCESS_KEY
   region: us-east-1
   app: swe1-app
-  env: django-env
+  env: swe1-app-env
   bucket: elasticbeanstalk-us-east-1-913524920459
   edge: true
   on:
