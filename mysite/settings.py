@@ -37,7 +37,7 @@ if not SECRET_KEY:
     SECRET_KEY = "django-insecure-local-development-only"
 
 ALLOWED_HOSTS = [
-    "django-env.eba-hqpup4q6.us-east-1.elasticbeanstalk.com",
+    "swe1-app-env.eba-bgyhiwfp.us-east-1.elasticbeanstalk.com",
     "127.0.0.1",
     "localhost",
 ]
